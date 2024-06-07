@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>.link:hover{text-decoration:underline; color: rgb(132, 212, 105)}
+  .cred{BORDER:2px double black;background-color:cyan}
+  .input{BORDER:2px double black}
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-image: url("../static/login.png"); /* Path to your background image */
+    background-size: cover; /* Makes the image cover the entire background */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center center; /* Centers the image */
+    background-attachment: fixed; /* Makes the background image fixed during scrolling */
+}
+  
+  </style>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body background="../static/login.png" >
+    <h2 align ="center" style="font-size:100px;background-color: cyan ;border: black double 5px;border-radius: 16px;padding: 16px;margin: 39px; align:center ;">Login</h2>
+    <form method="post" action="/login">
+      <br><br><br><br><br><br><br>
+      <table align="center" >
+        <tr><td class="cred"><label for="username">Username:</label></td>
+          <td><input type="text" id="username" name="username" class="input" required><br><br></td></tr>
+        <tr><td><label for="password" class="cred">Password:</label></td>
+          <td><input type="password" id="password" name="password" class="input" required><br><br></td></tr><tr>
+          <td span="2"><button type="submit" style="background-color:cyan;color:black;" class="link">Login</button></td>
+        </tr>
+        </table>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul style="color:red">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>

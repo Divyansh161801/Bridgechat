@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+  <style>.cred{BORDER:2px double black;background-color:cyan}
+         .input{BORDER:2px double black}
+        .link:hover{text-decoration:underline; color: rgb(132, 212, 105)}   
+         body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-image: url("../static/register.jpg"); /* Path to your background image */
+    background-size: cover; /* Makes the image cover the entire background */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center center; /* Centers the image */
+    background-attachment: fixed; /* Makes the background image fixed during scrolling */
+}
+  </style>
+</head>
+<body background="../static/register.jpg">
+    <h2 align="center" style="font-size:100px;background-color: cyan ;border: black double 5px;border-radius: 16px;padding: 16px;margin: 39px; align:center ;">Register</h2>
+  <table align="center">
+    <form method="post">
+      <tr>
+        <td class="cred">  <label for="username">Username:</label></td>
+       <td class="input"> <input type="text" id="username" name="username" required></td></tr><br><br>
+      <tr>  <td class="cred"> <label for="password">Password:</label></td>
+        <td class="input"> <input type="password" id="password" name="password" required></td></tr></><br><br>
+        
+        <tr>  <td class="link"><label for="email">Email</label></td>
+        <td class="link"><input type="email" id="email" name="email" required></td></tr>
+<tr><td class="link" > <button type="submit" style="background-color:cyan;color:black;">Register</button></td></tr>
+    </form>
+    </table>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    {% if success %}
+    <p style="color: green;">{{ success }}</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+</head>
+<body>
+    <h1>Welcome, {{ current_user.username }}</h1>
+    <a href="/logout">Logout</a>
+    <br>
+    <form action="/enter_chatroom" method="POST">
+        <label for="chatroom_number">Enter Chat Room Number:</label>
+        <input type="text" id="chatroom_number" name="chatroom_number" required>
+        <button type="submit">Enter Chat Room</button>
+    </form>
+    <br>
+    <form action="/dm" method="POST">
+        <label for="recipient">Recipient Username:</label>
+        <input type="text" id="recipient" name="recipient" required>
+        <button type="submit">Direct Message</button>
+    </form>
+</body>
+</html>

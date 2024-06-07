@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Direct Message</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
+            const recipient = "{{ recipient_name }}";
+            const username = "{{ current_user.username }}";
+            socket.emit('join', {room: recipient, username: username});
+
+            const form = document.getElementById('dm-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = document.getElementById('message').value;
+                socket.emit('message', {room: recipient, username: username, message: message});
+                document.getElementById('message').value = '';
+            });
+
+            socket.on('message', (data) => {
+                const dm = document.getElementById('dm');
+                const messageElement = document.createElement('p');
+                messageElement.innerHTML = data;
+                dm.appendChild(messageElement);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Direct Message with {{ recipient_name }}</h1>
+    <div id="dm"></div>
+    <form id="dm-form">
+        <input type="text" id="message" autocomplete="off">
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
