@@ -1,5 +1,4 @@
 alembic==1.13.1
-android==1.0
 astroid==2.15.8
 audiostream==0.2
 bidict==0.23.1
