@@ -27,8 +27,8 @@ def read_pem_file(filename):
     return hashed_key
 
 # Load hashed keys from PEM files
-hashed_private_key = read_pem_file('config/hashed_private_key.pem')
-hashed_public_key = read_pem_file('config/hashed_public_key.pem')
+hashed_private_key = read_pem_file('Config/hashed_private_key.pem')
+hashed_public_key = read_pem_file('Config/hashed_public_key.pem')
 
 # Set keys in Flask config
 load_dotenv('keys.env')
