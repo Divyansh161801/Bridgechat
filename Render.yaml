@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: my-flask-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:5000 home:app
+    # or if using a start script
+    # startCommand: ./start.sh
