@@ -9,3 +9,6 @@ on working on chat room funcyionality(3.6.24)
     
 4 june 2024 
     chatroom completed and functioning rpoperly
+
+8 june 2024
+    HAVE TO GIVE PEOGRAM ACCESS TO CREATE DIRECTORIES AND FILE ON THE SPECIFIC DIRECTORY CACJE TEMP DIR
