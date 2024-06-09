@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = io.connect('https://' + document.domain + ':' + location.port);
+    const protocol = location.protocol === 'https:' ? 'https://' : 'http://';
+    const socket = io.connect(protocol + document.domain + ':' + location.port);
 
     // Join room event
     const username = '{{ current_user.username }}';
