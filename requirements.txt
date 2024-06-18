@@ -1,7 +1,6 @@
 
 alembic==1.13.1
 astroid==2.15.8
-audiostream==0.2
 bidict==0.23.1
 blinker==1.8.2
 cachetools==4.2.4
