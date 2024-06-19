@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_socketio import SocketIO, join_room, leave_room, send
 from flask_migrate import Migrate
+from flask_talisman import Talisman 
 import os
 import time
 from googleapiclient.discovery import build
