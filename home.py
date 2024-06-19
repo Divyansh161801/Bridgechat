@@ -15,23 +15,25 @@ from dm import dm_bp
 
 app = Flask(__name__)
 
+# Initialize Talisman with your app
 csp = {
     'default-src': [
-        '\'self\'',
-        'https://cdn.socket.io'
+        "'self'",
+        'https://cdn.socket.io',  # Allow socket.io scripts
     ],
     'script-src': [
-        '\'self\'',
+        "'self'",
         'https://cdn.socket.io',
-        '\'unsafe-inline\''
+        "'unsafe-inline'",  # Allow inline scripts (if necessary)
     ],
-    'style-src': [
-        '\'self\'',
-        '\'unsafe-inline\''
-    ]
+    'connect-src': [
+        "'self'",
+        'https://cdn.socket.io',
+        'http://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
+    ],
 }
 
-talisman = Talisman(app, content_security_policy=csp)  # Apply Flask-Talisman to the Flask app
+Talisman(app, content_security_policy=csp)
 
 
 # Register the DM blueprint
