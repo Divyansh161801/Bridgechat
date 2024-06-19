@@ -13,6 +13,8 @@ from google.oauth2 import service_account
 from dm import dm_bp
 
 app = Flask(__name__)
+talisman = Talisman(app)  # Apply Flask-Talisman to the Flask app
+
 
 # Register the DM blueprint
 app.register_blueprint(dm_bp)
