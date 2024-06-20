@@ -65,7 +65,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="https://bridgechat-hdbq.onrender.com")
 
 # Google Drive API setup
 SCOPES = ['https://www.googleapis.com/auth/drive']
