@@ -15,6 +15,9 @@ from google.oauth2 import service_account
 from dm import dm_bp
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 # Initialize Talisman with your app
 csp = {
