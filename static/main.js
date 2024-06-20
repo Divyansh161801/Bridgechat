@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+var socket = io('https://bridgechat-hdbq.onrender.com');
+
 setInterval(() => {
     fetch('/keep-alive', {
         method: 'GET',
