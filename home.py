@@ -6,6 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_socketio import SocketIO, join_room, leave_room, send
 from flask_migrate import Migrate
 from flask_talisman import Talisman
+from flask_cors import CORS
 import os
 import time
 import threading
@@ -34,6 +35,9 @@ csp = {
         'https://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
     ],
 }
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 Talisman(app, content_security_policy=csp)
 
