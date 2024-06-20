@@ -19,6 +19,7 @@ Flask-Migrate==4.0.7
 Flask-SocketIO==5.3.6
 Flask-SQLAlchemy==3.1.1
 flask-talisman
+flask-cors
 gitdb==4.0.11
 GitPython==3.1.43
 google-api-core==2.19.0
