@@ -5,9 +5,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_socketio import SocketIO, join_room, leave_room, send
 from flask_migrate import Migrate
-from flask_talisman import Talisman 
+from flask_talisman import Talisman
 import os
 import time
+import threading
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
@@ -28,13 +29,11 @@ csp = {
     ],
     'connect-src': [
         "'self'",
-        'https://cdn.socket.io',
-        'http://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
+        'https://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
     ],
 }
 
 Talisman(app, content_security_policy=csp)
-
 
 # Register the DM blueprint
 app.register_blueprint(dm_bp)
@@ -215,34 +214,20 @@ def save_message_to_drive(room, username, message):
     try:
         timestamp = int(time.time())
         filename = f"{username}_{timestamp}.txt"
-        file_path = f"cache/temp_dir/chatroom/{room}/{filename}"
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
+        file_path = f"messages/{filename}"
         with open(file_path, 'w') as file:
-            file.write(message)
-
-        credentials = service_account.Credentials.from_service_account_file('instance/public key.json')
-        drive_service = build('drive', 'v3', credentials=credentials)
-        folder_id = "13VyJ03E2hW35njJt4Kl2epjc0x_R9Cfu"  # Change to your Google Drive folder ID
+            file.write(f"Room: {room}\nUsername: {username}\nMessage: {message}")
 
         file_metadata = {
             'name': filename,
-            'parents': [folder_id]
+            'mimeType': 'application/vnd.google-apps.document'
         }
         media = MediaFileUpload(file_path, mimetype='text/plain')
-
-        drive_service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        ).execute()
-        app.logger.info(f"File {filename} written and uploaded successfully.")
+        service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     except Exception as e:
-        app.logger.error(f"Error in getting or creating folder: {e}")
-# Other routes and views go here
+        app.logger.error(f"Error saving message to Google Drive: {e}")
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    socketio.run(app, host='127.0.0.1', port=5000, debug=True, use_reloader=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=True, allow_unsafe_werkzeug=True)
