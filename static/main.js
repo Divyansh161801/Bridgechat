@@ -33,13 +33,20 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('message', {username: username, room: room, message: message});
         messageInput.value = '';
     });
-});
 
-var socket = io('https://bridgechat-hdbq.onrender.com');
+    // Keep-alive request
+    setInterval(() => {
+        fetch('/keep-alive', {
+            method: 'GET',
+            credentials: 'same-origin'  // Include this if necessary
+        });
+    }, 600000);  // 600000 milliseconds = 10 minutes
 
-setInterval(() => {
-    fetch('/keep-alive', {
-        method: 'GET',
-        credentials: 'same-origin'  // Include this if necessary
+    socket.on('connect', function() {
+        console.log('Connected to the server');
     });
-}, 600000);  // 600000 milliseconds = 10 minutes
+
+    socket.on('disconnect', function() {
+        console.log('Disconnected from the server');
+    });
+});
