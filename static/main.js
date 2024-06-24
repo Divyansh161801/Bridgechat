@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const protocol = location.protocol === 'https:' ? 'https://' : 'http://';
+    const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
     const socket = io.connect(protocol + document.domain + ':' + location.port);
 
     // Join room event
@@ -33,20 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('message', {username: username, room: room, message: message});
         messageInput.value = '';
     });
-
-    // Keep-alive request
-    setInterval(() => {
-        fetch('/keep-alive', {
-            method: 'GET',
-            credentials: 'same-origin'  // Include this if necessary
-        });
-    }, 600000);  // 600000 milliseconds = 10 minutes
-
-    socket.on('connect', function() {
-        console.log('Connected to the server');
-    });
-
-    socket.on('disconnect', function() {
-        console.log('Disconnected from the server');
-    });
 });
+
+const socket = io('https://bridgechat-hdbq.onrender.com');
+
+socket.on('connect', function() {
+    console.log('Connected to the server');
+});
+
+socket.on('disconnect', function() {
+    console.log('Disconnected from the server');
+});
+
+// Define additional socket event handlers
+
+setInterval(() => {
+    fetch('/keep-alive', {
+        method: 'GET',
+        credentials: 'same-origin'  // Include this if necessary
+    });
+}, 600000);  // 600000 milliseconds = 10 minutes
