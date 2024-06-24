@@ -37,6 +37,7 @@ csp = {
 }
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
 socketio = SocketIO(app, cors_allowed_origins="*")
+ # Allow all origins for testing
 
 
 Talisman(app, content_security_policy=csp)
