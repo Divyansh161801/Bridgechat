@@ -14,9 +14,51 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
 from dm import dm_bp
+import traceback
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
+
+
+#initialise error handling 
+
+# Set up logging with a rotating file handler
+log_handler = RotatingFileHandler('server.log', maxBytes=1000000, backupCount=5)
+log_handler.setLevel(logging.INFO)
+log_formatter = logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+)
+log_handler.setFormatter(log_formatter)
+app.logger.addHandler(log_handler)
+
+# Set the logger for the app
+app.logger.setLevel(logging.INFO)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    app.logger.error(f"404 error: {error}")
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()  # In case of a database error
+    app.logger.error(f"500 error: {error}")
+    return render_template('500.html'), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    tb = traceback.format_exc()
+    app.logger.error(f"Unhandled Exception: {str(e)}\n{tb}")
+    return render_template('500.html'), 500
+
+@socketio.on_error_default  # Handles the default namespace
+def default_error_handler(e):
+    app.logger.error(f"Socket.IO error: {e}")
+
+
+#terminate error handling
 
 
 # Initialize Talisman with your app
