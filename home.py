@@ -20,6 +20,30 @@ from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
+# Initialize Talisman with your app
+csp = {
+    'default-src': [
+        "'self'",
+        'https://cdn.socket.io',  # Allow socket.io scripts
+    ],
+    'script-src': [
+        "'self'",
+        'https://cdn.socket.io',
+        "'unsafe-inline'",  # Allow inline scripts (if necessary)
+    ],
+    'connect-src': [
+        "'self'",
+        'https://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
+    ],
+}
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
+socketio = SocketIO(app, cors_allowed_origins="*")
+ # Allow all origins for testing
+
+
+Talisman(app, content_security_policy=csp)
+
+
 
 
 #initialise error handling 
@@ -61,28 +85,6 @@ def default_error_handler(e):
 #terminate error handling
 
 
-# Initialize Talisman with your app
-csp = {
-    'default-src': [
-        "'self'",
-        'https://cdn.socket.io',  # Allow socket.io scripts
-    ],
-    'script-src': [
-        "'self'",
-        'https://cdn.socket.io',
-        "'unsafe-inline'",  # Allow inline scripts (if necessary)
-    ],
-    'connect-src': [
-        "'self'",
-        'https://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
-    ],
-}
-CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
-socketio = SocketIO(app, cors_allowed_origins="*")
- # Allow all origins for testing
-
-
-Talisman(app, content_security_policy=csp)
 
 # Register the DM blueprint
 app.register_blueprint(dm_bp)
