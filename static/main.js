@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const socket = io.connect(protocol + document.domain + ':' + location.port);
+    const socket = io.connect('https://bridgechat-hdbq.onrender.com', {
+    transports: ['websocket', 'polling'],
+    upgrade: true
+});
 
     // Join room event
     const username = '{{ current_user.username }}';
