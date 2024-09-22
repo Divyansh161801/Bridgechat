@@ -8,23 +8,25 @@ from flask_migrate import Migrate
 from flask_talisman import Talisman
 from flask_cors import CORS
 import os
-import time
-import threading
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
 from dm import dm_bp
 import traceback
 from logging.handlers import RotatingFileHandler
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
-# Set the database URI directly
-app.config['postgresql://chatbridge_users_user:g560HHNYPOEoDIYzMWKcWD5RfXpGwcDu@dpg-crgppcbv2p9s73aeji7g-a/chatbridge_users '] = 'postgresql://chatbridge_users_user:g560HHNYPOEoDIYzMWKcWD5RfXpGwcDu@dpg-crgppcbv2p9s73aeji7g-a/chatbridge_users '
+# Set the database URI and other configurations from environment variables
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-
-# Initialize Talisman with your app
+# Initialize Talisman with content security policy
 csp = {
     'default-src': [
         "'self'",
@@ -44,8 +46,12 @@ csp = {
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
 Talisman(app, content_security_policy=csp)
 
-# Initialize SocketIO (only once)
-socketio = SocketIO(app, cors_allowed_origins="https://bridgechat-hdbq.onrender.com")
+# Initialize SocketIO
+socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "https://bridgechat-hdbq.onrender.com"))
+
+# Initialize database and migrations
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Set up logging with a rotating file handler
 log_handler = RotatingFileHandler('server.log', maxBytes=1000000, backupCount=5)
@@ -56,9 +62,23 @@ log_formatter = logging.Formatter(
 log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
 
-# Set the logger for the app
 app.logger.setLevel(logging.INFO)
 
+# Initialize login manager
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# User model
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
     app.logger.error(f"404 error: {error}")
@@ -76,19 +96,6 @@ def handle_exception(e):
     app.logger.error(f"Unhandled Exception: {str(e)}\n{tb}")
     return render_template('500.html'), 500
 
-@socketio.on_error_default  # Handles the default namespace
-def default_error_handler(e):
-    app.logger.error(f"Socket.IO error: {e}")
-
-# Register the DM blueprint
-app.register_blueprint(dm_bp)
-
-# Function to read the PEM files and extract the hash
-def read_pem_file(filename):
-    with open(filename, 'rb') as pem_file:
-        content = pem_file.read()
-    return content
-
 # Socket.IO events
 @socketio.on('join')
 def on_join(data):
@@ -102,42 +109,7 @@ def on_leave(data):
     leave_room(room)
     send(f"{current_user.username} has left the room.", to=room)
 
-# Load environment variables
-load_dotenv()
-
-# Google Drive API setup
-def get_drive_service():
-    creds = service_account.Credentials.from_service_account_file(
-        os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    )
-    return build('drive', 'v3', credentials=creds)
-
-def upload_to_drive(file_path, folder_id):
-    service = get_drive_service()
-    file_metadata = {
-        'name': os.path.basename(file_path),
-        'parents': [folder_id]
-    }
-    media = MediaFileUpload(file_path, resumable=True)
-    service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-
-# Additional Flask setup
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
+# Routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -148,7 +120,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('dashboard'))
         else:
@@ -166,5 +138,25 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
+# Google Drive API setup
+def get_drive_service():
+    creds = service_account.Credentials.from_service_account_file(
+        os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    )
+    return build('drive', 'v3', credentials=creds)
+
+def upload_to_drive(file_path, folder_id):
+    service = get_drive_service()
+    file_metadata = {
+        'name': os.path.basename(file_path),
+        'parents': [folder_id]
+    }
+    media = MediaFileUpload(file_path, resumable=True)
+    service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+# Register the DM blueprint
+app.register_blueprint(dm_bp)
+
+# Main entry point
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=os.getenv('FLASK_DEBUG', False))
