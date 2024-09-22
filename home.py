@@ -19,8 +19,12 @@ from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
-# Set the SQLALCHEMY_DATABASE_URI config
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+# Set the database URI directly
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://username:password@hostname:port/dbname'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
 
 # Initialize Talisman with your app
 csp = {
