@@ -75,6 +75,35 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
 
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Get the form data
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        
+        # Check if the user already exists (add your own logic here)
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please choose another one.', 'error')
+            return render_template('register.html')
+
+        # Add user to the database (this is an example, modify as needed)
+        new_user = User(username=username, password=password, email=email)
+        db.session.add(new_user)
+        db.session.commit()
+
+        # Success message
+        flash('Registration successful! You can now log in.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
