@@ -44,7 +44,6 @@ csp = {
     ],
 }
 
-CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
 Talisman(app, content_security_policy=csp)
 
 # Initialize SocketIO
