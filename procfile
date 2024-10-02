@@ -1,1 +1,1 @@
-web: gunicorn home:app --worker-class eventlet -w 1 --bind 0.0.0.0:10000
+web: gunicorn home:app --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT
