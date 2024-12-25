@@ -22,8 +22,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Set the database URI and other configurations from environment variables
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres+psycopg2://avnadmin:AVNS_4OjKcOSQHS3y2h-Ppgz@chatbridge-user-divyanshkushwaha161801-chatbridge.l.aivencloud.com:15967/defaultdb?sslmode=require'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://avnadmin:AVNS_4OjKcOSQHS3y2h-Ppgz@chatbridge-user-divyanshkushwaha161801-chatbridge.l.aivencloud.com:15967/defaultdb?sslmode=require
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
