@@ -17,7 +17,7 @@ from logging.handlers import RotatingFileHandler
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Load environment variables
-load_dotenv()
+load_dotenv('keys.env')
 
 app = Flask(__name__)
 
