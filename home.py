@@ -83,6 +83,9 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+
         
         # Check if the user already exists (add your own logic here)
         existing_user = User.query.filter_by(username=username).first()
@@ -91,7 +94,7 @@ def register():
             return render_template('register.html')
 
         # Add user to the database (this is an example, modify as needed)
-        new_user = User(username=username, password=password, email=email)
+        new_user = User(username=username, password=hashed_password, email=email)
         db.session.add(new_user)
         db.session.commit()
 
