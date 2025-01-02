@@ -28,20 +28,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Initialize Talisman with content security policy
 csp = {
-    'default-src': [
-        "'self'",
-        'https://cdn.socket.io',  # Allow socket.io scripts
-    ],
-    'script-src': [
-        "'self'",
-        'https://cdn.socket.io',
-        "'unsafe-inline'",  # Allow inline scripts (if necessary)
-    ],
-    'connect-src': [
-        "'self'",
-        'https://bridgechat-hdbq.onrender.com',  # Allow connections to your Socket.IO server
-    ],
-}
+    'default-src': ["'self'", "https://cdn.socket.io"],
+    'style-src': ["'self'", "https://cdn.socket.io", "'unsafe-inline'"],  # Add 'unsafe-inline' cautiously
+    }
 
 Talisman(app, content_security_policy=csp)
 
