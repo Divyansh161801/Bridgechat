@@ -37,7 +37,7 @@ permissions_policy = {
     "microphone": "none",
 }
 
-Talisman(app, content_security_policy=csp,permissions_policy=permissions_policy)
+Talisman(app, content_security_policy=csp,)
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "https://bridgechat-hdbq.onrender.com"))
