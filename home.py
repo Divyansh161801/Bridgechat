@@ -165,10 +165,11 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/chatroom')
+@app.route('/chatroom',method=['get','post'])
 @login_required
 def chatroom():
-    return render_template('chatroom.html')
+    if request.method == 'post'
+        return render_template('chatroom.html')
 
 # Google Drive API setup
 def get_drive_service():
