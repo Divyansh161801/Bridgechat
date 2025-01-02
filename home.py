@@ -94,7 +94,7 @@ def register():
 
         # Success message
         flash('Registration successful! You can now log in.', 'success')
-        return render_templaye('login.html')
+        return render_template('login.html')
     
     return render_template('register.html')
 
