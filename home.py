@@ -70,7 +70,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods='POST')
 def register():
     if request.method == 'POST':
         # Get the form data
