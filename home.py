@@ -70,7 +70,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
 
 
-@app.route('/register', methods='POST')
+@app.route('/register', methods=['get','POST'])
 def register():
     if request.method == 'POST':
         # Get the form data
@@ -94,7 +94,7 @@ def register():
 
         # Success message
         flash('Registration successful! You can now log in.', 'success')
-        return redirect(url_for('login'))
+        return render_templaye('login.html')
     
     return render_template('register.html')
 
