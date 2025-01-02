@@ -165,6 +165,11 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/chatroom')
+@login_required
+def chatroom():
+    return render_template('chatroom.html')
+
 # Google Drive API setup
 def get_drive_service():
     creds = service_account.Credentials.from_service_account_file(
