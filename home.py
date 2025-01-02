@@ -29,8 +29,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # Initialize Talisman with content security policy
 csp = {
     'default-src': ["'self'", "https://cdn.socket.io"],
-    'style-src': ["'self'", "https://cdn.socket.io", "'unsafe-inline'"],  # Add 'unsafe-inline' cautiously
-    }
+    'style-src': ["'self'", "https://cdn.socket.io", "'unsafe-inline'"],
+    'script-src': ["'self'", "https://cdn.socket.io", "'unsafe-inline'"],  # Add 'unsafe-inline' cautiously
+}
 permissions_policy = {
     "geolocation": "self",
     "camera": "none",
