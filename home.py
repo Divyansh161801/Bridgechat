@@ -31,8 +31,13 @@ csp = {
     'default-src': ["'self'", "https://cdn.socket.io"],
     'style-src': ["'self'", "https://cdn.socket.io", "'unsafe-inline'"],  # Add 'unsafe-inline' cautiously
     }
+permissions_policy = {
+    "geolocation": "self",
+    "camera": "none",
+    "microphone": "none",
+}
 
-Talisman(app, content_security_policy=csp)
+Talisman(app, content_security_policy=csp,permissions_policy=permissions_policy)
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "https://bridgechat-hdbq.onrender.com"))
