@@ -168,7 +168,7 @@ def dashboard():
 @app.route('/chatroom',method=['get','post'])
 @login_required
 def chatroom():
-    if request.method == 'post'
+    if request.method == 'post' :
         return render_template('chatroom.html')
 
 # Google Drive API setup
