@@ -172,7 +172,7 @@ def chatroom():
     room = session.get('room', 'default_room')
     username = session.get('username', 'Guest')
     if request.method == 'POST' :
-        return render_template('chatroom.html')
+        return render_template('chatroom.html'room=room, username=username)
     return none
 
 # Google Drive API setup
