@@ -169,6 +169,8 @@ def dashboard():
 @login_required
 
 def chatroom():
+    room = session.get('room', 'default_room')
+    username = session.get('username', 'Guest')
     if request.method == 'POST' :
         return render_template('chatroom.html')
     return none
