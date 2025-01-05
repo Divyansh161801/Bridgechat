@@ -165,7 +165,7 @@ def logout():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/chatroom',method=['get','POST'])
+@app.route('/chatroom',methods=['get','POST'])
 @login_required
 def chatroom():
     if request.method == 'POST' :
