@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const socket = io();
-
-    const room = document.getElementById('room-name').textContent;
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
     const messageList = document.getElementById('message-list');
+
+        // Access room and username from the global window object
+    const room = window.chatRoom;
+    const username = window.chatUsername
 
     // Join room
     socket.emit('join', { room: room });
