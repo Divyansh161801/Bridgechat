@@ -167,9 +167,11 @@ def dashboard():
 
 @app.route('/chatroom',methods=['get','POST'])
 @login_required
+
 def chatroom():
     if request.method == 'POST' :
         return render_template('chatroom.html')
+    return none
 
 # Google Drive API setup
 def get_drive_service():
