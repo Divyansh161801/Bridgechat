@@ -167,14 +167,19 @@ def dashboard():
     return render_template('dashboard.html')
 
 @app.route('/chatroom',methods=['get','POST'])
-@login_required
 
+
+@app.route('/chatroom', methods=['GET', 'POST'])
+@login_required
 def chatroom():
     room = session.get('room', 'default_room')
     username = session.get('username', 'Guest')
-    if request.method == 'POST' :
-        return render_template('chatroom.html',room=room, username=username)
-    return None
+    
+    if request.method == 'POST':
+        # Handle message saving to Google Drive here if needed
+        pass  # This prevents an accidental early return
+
+    return render_template('chatroom.html', room=room, username=username)
 
 # Google Drive API setup
 def get_drive_service():
