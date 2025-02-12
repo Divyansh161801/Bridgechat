@@ -11,8 +11,10 @@ import os
 import time
 import threading 
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
+from google.oauth2.service_account import credentials 
 from dm import dm_bp
 import traceback
 from logging.handlers import RotatingFileHandler
@@ -215,6 +217,50 @@ def upload_in_background(file_path, folder_id):
     """Runs the upload function in a separate thread."""
     thread = threading.Thread(target=upload_to_drive, args=(file_path, folder_id))
     thread.start()
+
+
+def get_or_create_chatroom_folder(chatroom_number):
+    """Get or create a chatroom folder in Google Drive."""
+    service = get_drive_service()
+    parent_folder_name = "chat"  # Root folder where all chatroom folders are stored
+
+    try:
+        # Search for the parent 'chat' folder
+        query = f"name='{parent_folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        response = service.files().list(q=query, fields="files(id, name)").execute()
+        folders = response.get('files', [])
+        
+        if folders:
+            parent_folder_id = folders[0]['id']
+        else:
+            # Create the parent folder if it doesn’t exist
+            folder_metadata = {
+                'name': parent_folder_name,
+                'mimeType': 'application/vnd.google-apps.folder'
+            }
+            folder = service.files().create(body=folder_metadata, fields="id").execute()
+            parent_folder_id = folder.get('id')
+
+        # Search for the chatroom folder inside the parent folder
+        query = f"name='{chatroom_number}' and mimeType='application/vnd.google-apps.folder' and trashed=false and '{parent_folder_id}' in parents"
+        response = service.files().list(q=query, fields="files(id, name)").execute()
+        folders = response.get('files', [])
+
+        if folders:
+            return folders[0]['id']  # Folder exists, return its ID
+
+        # If the folder doesn't exist, create it
+        folder_metadata = {
+            'name': chatroom_number,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [parent_folder_id]
+        }
+        folder = service.files().create(body=folder_metadata, fields="id").execute()
+        return folder.get('id')
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+        return None
 
 def upload_to_drive(username, room, message):
     """Saves message locally and uploads it to the correct Google Drive folder."""
