@@ -174,17 +174,20 @@ def dashboard():
 
 
 @app.route('/chatroom', methods=['GET', 'POST'])
-@login_required
 def chatroom():
-    room = session.get('room', 'default_room')
+    room = session.get('room', '0000')  # Default room if not defined
     username = session.get('username', 'Guest')
-    
+
     if request.method == 'POST':
-        # Handle message saving to Google Drive here if needed
-        pass  # This prevents an accidental early return
+        message = request.form.get('message')  # Get the message from form input
+
+        if message:
+            folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
+            file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
+            upload_to_drive(file_path, folder_id)  # Step 3: Upload the file to Google Drive
 
     return render_template('chatroom.html', room=room, username=username)
-
+    
 # Google Drive API setup
 def get_drive_service():
     creds = service_account.Credentials.from_service_account_file(
