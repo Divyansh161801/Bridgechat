@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
+    const socket = io("https://bridgechat-hdbq.onrender.com", {
+    transports: ["websocket"]
+});
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
     const messageList = document.getElementById('message-list');
