@@ -222,7 +222,7 @@ def upload_in_background(file_path, folder_id):
 def get_or_create_chatroom_folder(chatroom_number):
     """Get or create a chatroom folder in Google Drive."""
     service = get_drive_service()
-    parent_folder_name = "chat"  # Root folder where all chatroom folders are stored
+    parent_folder_name = "Chat"  # Root folder where all chatroom folders are stored
 
     try:
         # Search for the parent 'chat' folder
