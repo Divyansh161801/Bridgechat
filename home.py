@@ -41,7 +41,7 @@ permissions_policy = {
 Talisman(app, content_security_policy=csp,)
 
 # Initialize SocketIO
-eventlet.monkey_patch()
+
 socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "*",transport="websocket"))
 
 # Initialize database and migrations
