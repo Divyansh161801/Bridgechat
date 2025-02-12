@@ -3,20 +3,21 @@
 <head>
     <title>Chat Room {{ room }}</title>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
-   <script src="{{ url_for('static', filename='main.js') }}"></script>
-       <script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script>
         // Pass dynamic data to the JavaScript
         window.chatRoom = "{{ room }}";
         window.chatUsername = "{{ username }}";
-       </script>
+    </script>
 </head>
 <body>
     <h1>Welcome to Chatroom: {{ room }}</h1>
     <p>Current User: {{ username }}</p>
     <div id="messages"></div>
-    <form id="messageForm">
+    <form id="messageForm"> <!-- Fixed ID -->
         <input type="text" id="messageInput" placeholder="Type your message here">
         <button type="submit">Send</button>
     </form>
 </body>
 </html>
+
