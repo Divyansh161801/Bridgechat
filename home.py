@@ -184,7 +184,7 @@ def chatroom():
         if message:
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
-            upload_in_background(file_path, folder_id)  # Step 3: Upload the file to Google Drive
+            upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
 
     return render_template('chatroom.html', room=room, username=username)
     
