@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const socket = io("https://bridgechat-hdbq.onrender.com", {
     transports: ["websocket"]
-});
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const messageList = document.getElementById('message-list');
-
+});const messageForm = document.getElementById('messageForm');  // Fixed ID
+    const messageInput = document.getElementById('messageInput'); // Fixed ID
+    const messageList = document.getElementById('messages'); // Fixed ID
+    
         // Access room and username from the global window object
     const room = window.chatRoom;
     const username = window.chatUsername
