@@ -24,6 +24,8 @@ load_dotenv('keys.env')
 app = Flask(__name__)
 
 CACHE_DIR = "cache"
+CHAT_PARENT_FOLDER_ID ="13VyJ03E2hW35njJt4Kl2epjc0x_R9Cfu"
+
 
 # Set the database URI and other configurations from environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://avnadmin:AVNS_4OjKcOSQHS3y2h-Ppgz@chatbridge-user-divyanshkushwaha161801-chatbridge.l.aivencloud.com:15967/defaultdb?sslmode=require'
@@ -208,18 +210,20 @@ def save_message_to_cache(username, room, message):
     return file_path  # Return file path for uploading
     
 
-
-def upload_to_drive(file_path, folder_id):
+def upload_to_drive(username, room, message):
+    """Saves message locally and uploads it to the correct Google Drive folder."""
     service = get_drive_service()
+    chatroom_folder_id = get_or_create_chatroom_folder(service, room or "0000")
+
+    file_path = save_message_to_cache(username, room, message)
     file_metadata = {
         'name': os.path.basename(file_path),
-        'parents': [folder_id]
+        'parents': [chatroom_folder_id]
     }
     media = MediaFileUpload(file_path, resumable=True)
     service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
-# Register the DM blueprint
-app.register_blueprint(dm_bp)
+
 
 # Main entry point
 if __name__ == '__main__':
