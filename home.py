@@ -23,7 +23,7 @@ load_dotenv('keys.env')
 
 app = Flask(__name__)
 
-CACHE_DIR = "cache"
+CACHE_DIR = "/temp/cache"
 CHAT_PARENT_FOLDER_ID ="13VyJ03E2hW35njJt4Kl2epjc0x_R9Cfu"
 
 
