@@ -42,7 +42,7 @@ Talisman(app, content_security_policy=csp,)
 
 # Initialize SocketIO
 
-socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "*"))
+socketio = SocketIO(app, cors_allowed_origins=os.getenv('CORS_ALLOWED_ORIGINS', "*"),async_mode="threading",manage_session=False)
 
 # Initialize database and migrations
 db = SQLAlchemy(app)
