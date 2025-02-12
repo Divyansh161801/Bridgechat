@@ -23,6 +23,8 @@ load_dotenv('keys.env')
 
 app = Flask(__name__)
 
+CACHE_DIR = "cache"
+
 # Set the database URI and other configurations from environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://avnadmin:AVNS_4OjKcOSQHS3y2h-Ppgz@chatbridge-user-divyanshkushwaha161801-chatbridge.l.aivencloud.com:15967/defaultdb?sslmode=require'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -189,6 +191,23 @@ def get_drive_service():
         os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     )
     return build('drive', 'v3', credentials=creds)
+
+
+def save_message_to_cache(username, room, message):
+    """Creates a file in /cache/ with the message content."""
+    timestamp = int(time.time())
+    file_name = f"{username}.{room}.{timestamp}.txt"
+    file_path = os.path.join(CACHE_DIR, file_name)
+
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)  # Create cache directory if missing
+
+    with open(file_path, "w") as f:
+        f.write(message)
+    
+    return file_path  # Return file path for uploading
+    
+
 
 def upload_to_drive(file_path, folder_id):
     service = get_drive_service()
