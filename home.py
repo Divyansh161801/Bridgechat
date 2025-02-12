@@ -184,7 +184,7 @@ def chatroom():
         if message:
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
-            upload_to_drive(file_path, folder_id)  # Step 3: Upload the file to Google Drive
+            upload_in_background(file_path, folder_id)  # Step 3: Upload the file to Google Drive
 
     return render_template('chatroom.html', room=room, username=username)
     
@@ -209,7 +209,12 @@ def save_message_to_cache(username, room, message):
         f.write(message)
     
     return file_path  # Return file path for uploading
-    
+
+
+def upload_in_background(file_path, folder_id):
+    """Runs the upload function in a separate thread."""
+    thread = threading.Thread(target=upload_to_drive, args=(file_path, folder_id))
+    thread.start()
 
 def upload_to_drive(username, room, message):
     """Saves message locally and uploads it to the correct Google Drive folder."""
