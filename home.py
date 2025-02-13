@@ -25,9 +25,10 @@ load_dotenv('keys.env')
 
 app = Flask(__name__)
 
-CACHE_DIR = "/temp/cache"
-CHAT_PARENT_FOLDER_ID ="13VyJ03E2hW35njJt4Kl2epjc0x_R9Cfu"
-
+CACHE_DIR = "/tmp/cache"
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)  # Ensure the directory exists
+    
 
 # Set the database URI and other configurations from environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://avnadmin:AVNS_4OjKcOSQHS3y2h-Ppgz@chatbridge-user-divyanshkushwaha161801-chatbridge.l.aivencloud.com:15967/defaultdb?sslmode=require'
