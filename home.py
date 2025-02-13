@@ -200,18 +200,24 @@ def get_drive_service():
 
 
 def save_message_to_cache(username, room, message):
-    """Creates a file in /cache/ with the message content."""
     timestamp = int(time.time())
     file_name = f"{username}.{room}.{timestamp}.txt"
     file_path = os.path.join(CACHE_DIR, file_name)
 
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)  # Create cache directory if missing
+    try:
+        if not os.path.exists(CACHE_DIR):
+            os.makedirs(CACHE_DIR)
+            app.logger.info(f"Created cache directory at {CACHE_DIR}")
 
-    with open(file_path, "w") as f:
-        f.write(message)
-    
-    return file_path  # Return file path for uploading
+        with open(file_path, "w") as f:
+            f.write(message)
+            app.logger.info(f"Saved message to cache: {file_path}")
+
+        return file_path
+
+    except Exception as e:
+        app.logger.error(f"Error saving message to cache: {e}")
+        return None
 
 
 def upload_in_background(file_path, folder_id):
@@ -221,61 +227,44 @@ def upload_in_background(file_path, folder_id):
 
 
 def get_or_create_chatroom_folder(chatroom_number):
-    """Get or create a chatroom folder in Google Drive."""
     service = get_drive_service()
-    parent_folder_name = "Chat"  # Root folder where all chatroom folders are stored
+    parent_folder_name = "Chat"  
 
+    
     try:
-        # Search for the parent 'chat' folder
+        # Search for the parent 'Chat' folder
         query = f"name='{parent_folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
         response = service.files().list(q=query, fields="files(id, name)").execute()
         folders = response.get('files', [])
         
         if folders:
             parent_folder_id = folders[0]['id']
+            app.logger.info(f"Parent folder '{parent_folder_name}' found with ID: {parent_folder_id}")
         else:
-            # Create the parent folder if it doesn’t exist
-            folder_metadata = {
-                'name': parent_folder_name,
-                'mimeType': 'application/vnd.google-apps.folder'
-            }
+            # Create the parent folder
+            folder_metadata = {'name': parent_folder_name, 'mimeType': 'application/vnd.google-apps.folder'}
             folder = service.files().create(body=folder_metadata, fields="id").execute()
             parent_folder_id = folder.get('id')
+            app.logger.info(f"Created parent folder '{parent_folder_name}' with ID: {parent_folder_id}")
 
-        # Search for the chatroom folder inside the parent folder
+        # Search for chatroom folder
         query = f"name='{chatroom_number}' and mimeType='application/vnd.google-apps.folder' and trashed=false and '{parent_folder_id}' in parents"
         response = service.files().list(q=query, fields="files(id, name)").execute()
         folders = response.get('files', [])
 
         if folders:
-            return folders[0]['id']  # Folder exists, return its ID
+            app.logger.info(f"Chatroom folder '{chatroom_number}' found with ID: {folders[0]['id']}")
+            return folders[0]['id']
 
-        # If the folder doesn't exist, create it
-        folder_metadata = {
-            'name': chatroom_number,
-            'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [parent_folder_id]
-        }
+        # Create chatroom folder
+        folder_metadata = {'name': chatroom_number, 'mimeType': 'application/vnd.google-apps.folder', 'parents': [parent_folder_id]}
         folder = service.files().create(body=folder_metadata, fields="id").execute()
+        app.logger.info(f"Created chatroom folder '{chatroom_number}' with ID: {folder.get('id')}")
         return folder.get('id')
 
     except HttpError as error:
-        print(f"An error occurred: {error}")
+        app.logger.error(f"Error in get_or_create_chatroom_folder: {error}")
         return None
-
-def upload_to_drive(username, room, message):
-    """Saves message locally and uploads it to the correct Google Drive folder."""
-    service = get_drive_service()
-    chatroom_folder_id = get_or_create_chatroom_folder(room or "0000")
-
-    file_path = save_message_to_cache(username, room, message)
-    file_metadata = {
-        'name': os.path.basename(file_path),
-        'parents': [chatroom_folder_id]
-    }
-    media = MediaFileUpload(file_path, resumable=True)
-    service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-
 
 
 # Main entry point
