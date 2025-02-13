@@ -266,7 +266,7 @@ def get_or_create_chatroom_folder(chatroom_number):
 def upload_to_drive(username, room, message):
     """Saves message locally and uploads it to the correct Google Drive folder."""
     service = get_drive_service()
-    chatroom_folder_id = get_or_create_chatroom_folder(service, room or "0000")
+    chatroom_folder_id = get_or_create_chatroom_folder(room or "0000")
 
     file_path = save_message_to_cache(username, room, message)
     file_metadata = {
