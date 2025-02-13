@@ -177,7 +177,9 @@ def dashboard():
 
 
 @app.route('/chatroom', methods=['GET', 'POST'])
+@login_required
 def chatroom():
+    logging.debug("chatroom is executed")
     room = session.get('room', '0000')  # Default room if not defined
     username = session.get('username', 'Guest')
 
