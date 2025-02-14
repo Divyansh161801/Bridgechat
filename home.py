@@ -193,8 +193,10 @@ def chatroom():
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
             upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
-
-    return render_template('chatroom.html', room=room, username=username)
+            Google Drive messages = fetch_messages_from_drive(room)
+    
+       
+    return render_template('chatroom.html', room=room, username=username , messages=messages )
     
 # Google Drive API setup
 def get_drive_service():
@@ -292,6 +294,41 @@ def upload_to_drive(username, room, message):
     file = service.files().create(body=file_metadata, media_body=media).execute()
 
     return file.get("id")  # Return the file ID
+
+
+import io
+from googleapiclient.http import MediaIoBaseDownload
+
+def fetch_messages_from_drive(room):
+    service = get_drive_service()
+    folder_id = get_or_create_chatroom_folder(room)
+
+    messages = []
+    
+    # Get list of message files in the chatroom folder
+    query = f"'{folder_id}' in parents and mimeType='text/plain'"
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get('files', [])
+
+    for file in files:
+        file_id = file['id']
+        file_name = file['name']
+
+        # Download file content
+        request = service.files().get_media(fileId=file_id)
+        file_stream = io.BytesIO()
+        downloader = MediaIoBaseDownload(file_stream, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+        # Read the message
+        file_stream.seek(0)
+        message_text = file_stream.read().decode('utf-8')
+        messages.append({'user': file_name.replace(".txt", ""), 'message': message_text})
+
+    return messages
+
 
 # Main entry point
 if __name__ == '__main__':
