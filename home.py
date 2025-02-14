@@ -185,6 +185,7 @@ def chatroom():
     logging.debug("chatroom is executed")
     room = session.get('room', '0000')  # Default room if not defined
     username = session.get('username', 'Guest')
+    messages = fetch_messages_from_drive(room)
 
     if request.method == 'POST':
         message = request.form.get('message')  # Get the message from form input
@@ -193,7 +194,7 @@ def chatroom():
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
             upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
-            messages = fetch_messages_from_drive(room)
+            
     
        
     return render_template('chatroom.html', room=room, username=username , messages=messages )
