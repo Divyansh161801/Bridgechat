@@ -18,6 +18,11 @@
         <input type="text" name ="message" id="messageInput" placeholder="Type your message here">
         <button type="submit">Send</button>
     </form>
+    <div id="messages">
+    {% for msg in messages %}
+        <p><strong>{{ msg.user }}:</strong> {{ msg.message }}</p>
+    {% endfor %}
+    </div>
 </body>
 </html>
 
