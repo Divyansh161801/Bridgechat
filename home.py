@@ -268,6 +268,27 @@ def get_or_create_chatroom_folder(chatroom_number):
         app.logger.error(f"Error in get_or_create_chatroom_folder: {error}")
         return None
 
+def upload_to_drive(username, room, message):
+    """Uploads a message to Google Drive."""
+    service = get_drive_service()  # Get authenticated Drive service
+
+    # Ensure the chatroom folder exists
+    folder_id = get_or_create_chatroom_folder(room)
+
+    # Create a file name based on timestamp
+    from datetime import datetime
+    file_name = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{username}.txt"
+    
+    file_metadata = {
+        "name": file_name,
+        "parents": [folder_id],
+        "mimeType": "text/plain"
+    }
+    
+    media = MediaIoBaseUpload(io.BytesIO(message.encode()), mimetype="text/plain")
+    file = service.files().create(body=file_metadata, media_body=media).execute()
+
+    return file.get("id")  # Return the file ID
 
 # Main entry point
 if __name__ == '__main__':
