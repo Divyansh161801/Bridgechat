@@ -306,7 +306,9 @@ def fetch_messages_from_drive(room):
     service = get_drive_service()
     folder_id = get_or_create_chatroom_folder(room)
 
-    messages = []
+      # ✅ **Re-fetch messages (still filtering by join_time)**
+    all_messages = fetch_messages_from_drive(room)
+    messages = [msg for msg in all_messages if extract_timestamp(msg['user']) >= join_time]
     
     # Get list of message files in the chatroom folder
     query = f"'{folder_id}' in parents and mimeType='text/plain'"
