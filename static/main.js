@@ -43,6 +43,45 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.value = ''; // Clear input after sending
     });
 
+
+from Flask (Stored in Google Drive)**
+    fetch(`/get_messages?room=${room}`)
+        .then(response => response.json())
+        .then(data => {
+            data.messages.forEach(msg => {
+                displayMessage(msg.user, msg.message);
+            });
+        })
+        .catch(error => console.error("Error fetching messages:", error));
+
+    // **2️⃣ Receive new messages from the server (Real-Time Update)**
+    socket.on('message', (data) => {
+        displayMessage(data.user, data.message);
+    });
+
+    // **3️⃣ Send a new message**
+    messageForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+
+        if (message) {
+            socket.emit('message', { room: room, message: message });
+
+            // **Update UI instantly**
+            displayMessage(username, message);
+            messageInput.value = '';
+        }
+    });
+
+    // **4️⃣ Function to display messages in chat UI**
+    function displayMessage(user, message) {
+        const msgElement = document.createElement('p');
+        msgElement.innerHTML = `<strong>${user}:</strong> ${message}`;
+        messageList.appendChild(msgElement);
+        }
+                
+
+    
     // Handle user leaving the room
     window.addEventListener('beforeunload', () => {
         socket.emit('leave', { room: room });
