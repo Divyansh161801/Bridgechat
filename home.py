@@ -186,6 +186,8 @@ def chatroom():
     room = session.get('room', '0000')  # Default room if not defined
     username = session.get('username', 'Guest')
     messages = fetch_messages_from_drive(room)
+    join_message = {'user': 'System', 'message': f"{username} has joined the room."}
+    messages.insert(0, join_message)
 
     if request.method == 'POST':
         message = request.form.get('message')  # Get the message from form input
