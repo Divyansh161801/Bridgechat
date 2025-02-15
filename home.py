@@ -191,6 +191,7 @@ def chatroom():
 
     entry_time = session['entry_time']
     
+    messages = fetch_messages_from_drive(room, entry_time) 
     join_message = {'user': 'System', 'message': f"{username} has joined the room."}
     messages.insert(0, join_message)
     
@@ -203,7 +204,7 @@ def chatroom():
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
             upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
 
-    messages = fetch_messages_from_drive(room, entry_time) 
+    
     
     return render_template('chatroom.html', room=room, username=username , messages=messages )
     
