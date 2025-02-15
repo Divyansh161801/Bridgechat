@@ -329,8 +329,8 @@ def fetch_messages_from_drive(room, entry_time):
         file_time = datetime.fromisoformat(file_time_str[:-1]).timestamp()  # Remove 'Z' from ISO format
 
         # Ignore messages created before entry time
-        if file_time < entry_time:
-            continue
+        '''if file_time < entry_time:
+            continue'''
 
         # Download file content
         request = service.files().get_media(fileId=file_id)
