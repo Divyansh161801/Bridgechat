@@ -202,6 +202,7 @@ def chatroom():
         message = request.form.get('message')  # Get the message from form input
 
         if message:
+            socketio.emit('message', {'user': username, 'message': message}, room=room)
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
             upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
