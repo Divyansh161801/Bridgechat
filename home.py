@@ -151,6 +151,17 @@ def on_leave(data):
     leave_room(room)
     send(f"{current_user.username} has left the room.", to=room)
 
+@socketio.on('message')
+def handle_message(data):
+    room = data['room']
+    message = data['message']
+    user = session.get('username', 'Unknown')
+
+    # Save to Google Drive
+    save_message_to_drive(room, user, message)
+
+    # 🔥 Broadcast message to all clients in the room
+    socketio.emit('message', {'user': user, 'message': message}, room=room)
 # Routes
 @app.route('/')
 def index():
