@@ -185,9 +185,15 @@ def chatroom():
     logging.debug("chatroom is executed")
     room = session.get('room', '0000')  # Default room if not defined
     username = session.get('username', 'Guest')
+    # Store the user's entry timestamp in the session
+    if 'entry_time' not in session:
+        session['entry_time'] = int(time.time())
+
+    entry_time = session['entry_time']
     messages = fetch_messages_from_drive(room)
     join_message = {'user': 'System', 'message': f"{username} has joined the room."}
     messages.insert(0, join_message)
+    
 
     if request.method == 'POST':
         message = request.form.get('message')  # Get the message from form input
@@ -196,9 +202,8 @@ def chatroom():
             folder_id = get_or_create_chatroom_folder(room)  # Step 1: Ensure chatroom folder exists
             file_path = save_message_to_cache(username, room, message)  # Step 2: Save message to local cache
             upload_to_drive(username, room, message)  # Step 3: Upload the file to Google Drive
-            
-    
-       
+
+    messages = fetch_messages_from_drive(room, entry_time) 
     return render_template('chatroom.html', room=room, username=username , messages=messages )
     
 # Google Drive API setup
@@ -302,19 +307,26 @@ def upload_to_drive(username, room, message):
 import io
 from googleapiclient.http import MediaIoBaseDownload
 
-def fetch_messages_from_drive(room):
+def fetch_messages_from_drive(room, entry_time):
     service = get_drive_service()
     folder_id = get_or_create_chatroom_folder(room)
+
     messages = []
-    
-    # Get list of message files in the chatroom folder
     query = f"'{folder_id}' in parents and mimeType='text/plain'"
-    results = service.files().list(q=query, fields="files(id, name)").execute()
+    results = service.files().list(q=query, fields="files(id, name, createdTime)").execute()
     files = results.get('files', [])
 
     for file in files:
         file_id = file['id']
         file_name = file['name']
+        file_time_str = file.get('createdTime')
+
+        # Convert Google Drive file time to timestamp
+        file_time = datetime.fromisoformat(file_time_str[:-1]).timestamp()  # Remove 'Z' from ISO format
+
+        # Ignore messages created before entry time
+        if file_time < entry_time:
+            continue
 
         # Download file content
         request = service.files().get_media(fileId=file_id)
@@ -324,13 +336,11 @@ def fetch_messages_from_drive(room):
         while not done:
             _, done = downloader.next_chunk()
 
-        # Read the message
         file_stream.seek(0)
         message_text = file_stream.read().decode('utf-8')
         messages.append({'user': file_name.replace(".txt", ""), 'message': message_text})
 
     return messages
-
 
 # Main entry point
 if __name__ == '__main__':
