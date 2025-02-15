@@ -158,7 +158,7 @@ def handle_message(data):
     user = session.get('username', 'Unknown')
 
     # Save to Google Drive
-    save_message_to_drive(room, user, message)
+    upload_to_drive(username, room, message)
 
     # 🔥 Broadcast message to all clients in the room
     socketio.emit('message', {'user': user, 'message': message}, room=room)
