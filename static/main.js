@@ -55,11 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // **4️⃣ Function to display messages in the chat UI**
     function displayMessage(user, message) {
-        const msgElement = document.createElement('p');
-        msgElement.innerHTML = `<strong>${user}:</strong> ${message}`;
+    const msgElement = document.createElement('p');
+    msgElement.innerHTML = `<strong>${user}:</strong> ${message}`;
+    
+    const messageList = document.getElementById('messages');
+    if (messageList) {
         messageList.appendChild(msgElement);
+        messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to new messages
+    } else {
+        console.error("Error: #messages div not found");
     }
-
+    }
     // **5️⃣ Handle user leaving the room**
     window.addEventListener('beforeunload', () => {
         socket.emit('leave', { room: room });
