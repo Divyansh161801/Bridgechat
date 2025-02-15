@@ -14,37 +14,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Join room
     socket.emit('join', { room: room });
 
-    // Receive message from server and display it
-    socket.on('message', (message) => {
-        const li = document.createElement('li');
-        li.textContent = message;
-        messageList.appendChild(li);
+    // **1️⃣ Listen for new messages and update UI instantly**
+    socket.on('message', (data) => {
+        displayMessage(data.user, data.message);
     });
 
-    // Send message to WebSocket & Flask
+    // **2️⃣ Send message (Instant for UI + WebSocket, Async for Drive)**
     messageForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent page refresh
-
+        event.preventDefault();
         const message = messageInput.value.trim();
         if (!message) return;
 
-        // Send message via WebSocket
-        socket.emit('message', { room: room, message: message });
+        // **Send message via WebSocket for real-time update**
+        socket.emit('message', { room: room, user: username, message: message });
 
-        // Send message to Flask backend
-        const formData = new FormData(messageForm);
+        // **Update UI instantly for sender**
+        displayMessage(username, message);
+
+        // **Send message to Flask backend for Google Drive storage (Async)**
         fetch('/chatroom', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room: room, user: username, message: message })
         }).then(response => response.text())
-          .then(data => console.log("Message sent to Flask:", data))
-          .catch(error => console.error("Error sending message:", error));
+          .then(data => console.log("Message saved in Drive:", data))
+          .catch(error => console.error("Error saving message:", error));
 
         messageInput.value = ''; // Clear input after sending
     });
 
-
-from Flask (Stored in Google Drive)**
+    // **3️⃣ Fetch existing messages from Google Drive (Only once)**
     fetch(`/get_messages?room=${room}`)
         .then(response => response.json())
         .then(data => {
@@ -54,35 +53,14 @@ from Flask (Stored in Google Drive)**
         })
         .catch(error => console.error("Error fetching messages:", error));
 
-    // **2️⃣ Receive new messages from the server (Real-Time Update)**
-    socket.on('message', (data) => {
-        displayMessage(data.user, data.message);
-    });
-
-    // **3️⃣ Send a new message**
-    messageForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const message = messageInput.value.trim();
-
-        if (message) {
-            socket.emit('message', { room: room, message: message });
-
-            // **Update UI instantly**
-            displayMessage(username, message);
-            messageInput.value = '';
-        }
-    });
-
     // **4️⃣ Function to display messages in chat UI**
     function displayMessage(user, message) {
         const msgElement = document.createElement('p');
         msgElement.innerHTML = `<strong>${user}:</strong> ${message}`;
         messageList.appendChild(msgElement);
-        }
-                
+    }
 
-    
-    // Handle user leaving the room
+    // **5️⃣ Handle user leaving the room**
     window.addEventListener('beforeunload', () => {
         socket.emit('leave', { room: room });
     });
